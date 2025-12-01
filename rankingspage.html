@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dynamic Survey</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .ranking-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+      width: 300px;
+    }
+
+    .ranking-list li {
+      padding: 10px;
+      margin: 5px 0;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      cursor: grab;
+    }
+
+    .ranking-list li.dragging {
+      opacity: 0.5;
+    }
+
+    #results {
+      margin-top: 30px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      background: #fafafa;
+    }
+  </style>
+</head>
+<body>
+  <!-- Survey Container -->
+  <div id="survey-container">
+    <h1>Survey</h1>
+
+    <!-- Step 1: Name -->
+    <div>
+      <label for="name">Your Name:</label><br>
+      <input type="text" id="name" name="name">
+    </div>
+
+    <!-- Step 2: Group Selection -->
+    <div style="margin-top:20px;">
+      <p>Select your group:</p>
+      <label><input type="radio" name="group" value="A"> Group A</label><br>
+      <label><input type="radio" name="group" value="B"> Group B</label><br>
+      <label><input type="radio" name="group" value="C"> Group C</label>
+    </div>
+
+    <!-- Step 3: Ranking -->
+    <div id="ranking-section" class="hidden" style="margin-top:20px;">
+      <p>Rank the following members by dragging them into order:</p>
+      <ul id="ranking-list" class="ranking-list"></ul>
+    </div>
+
+    <!-- Submit Button -->
+    <div style="margin-top:20px;">
+      <button id="submit-btn">Submit</button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="results" class="hidden"></div>
+
+  <script type="module">
+    const groups = {
+      A: ["Alice", "Aaron", "Ava", "Andrew"],
+      B: ["Bob", "Bella", "Ben", "Bianca"],
+      C: ["Charlie", "Chloe", "Caleb", "Cassandra"]
+    };
+
+    const groupRadios = document.querySelectorAll('input[name="group"]');
+    const rankingSection = document.getElementById("ranking-section");
+    const rankingList = document.getElementById("ranking-list");
+    const submitBtn = document.getElementById("submit-btn");
+    const resultsDiv = document.getElementById("results");
+    const surveyContainer = document.getElementById("survey-container");
+
+    groupRadios.forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        const selectedGroup = e.target.value;
+        populateRanking(groups[selectedGroup]);
+        rankingSection.classList.remove("hidden");
+      });
+    });
+
+    function populateRanking(members) {
+      rankingList.innerHTML = ""; // Clear old options
+      members.forEach(member => {
+        const li = document.createElement("li");
+        li.textContent = member;
+        li.setAttribute("draggable", "true");
+        rankingList.appendChild(li);
+      });
+      addDragAndDrop();
+    }
+
+    function addDragAndDrop() {
+      const listItems = rankingList.querySelectorAll("li");
+
+      listItems.forEach(item => {
+        item.addEventListener("dragstart", () => {
+          item.classList.add("dragging");
+        });
+        item.addEventListener("dragend", () => {
+          item.classList.remove("dragging");
+        });
+      });
+
+      rankingList.addEventListener("dragover", e => {
+        e.preventDefault();
+        const draggingItem = document.querySelector(".dragging");
+        const afterElement = getDragAfterElement(rankingList, e.clientY);
+        if (afterElement == null) {
+          rankingList.appendChild(draggingItem);
+        } else {
+          rankingList.insertBefore(draggingItem, afterElement);
+        }
+      });
+    }
+
+    function getDragAfterElement(container, y) {
+      const draggableElements = [...container.querySelectorAll("li:not(.dragging)")];
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    // Handle Submit
+    submitBtn.addEventListener("click", () => {
+      const name = document.getElementById("name").value.trim();
+      const group = document.querySelector('input[name="group"]:checked')?.value;
+      const ranking = [...rankingList.querySelectorAll("li")].map(li => li.textContent);
+
+      if (!name || !group || ranking.length === 0) {
+        alert("Please fill out all fields before submitting.");
+        return;
+      }
+
+      // Hide survey, show results
+      surveyContainer.classList.add("hidden");
+
+      resultsDiv.innerHTML = `
+        <h2>Survey Results</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Group:</strong> ${group}</p>
+        <p><strong>Ranking Order:</strong></p>
+        <ol>${ranking.map(item => `<li>${item}</li>`).join("")}</ol>
+      `;
+
+      const resultbin = 
+      {
+        Cadet: name.toLowerCase(), 
+        Ranking: ranking
+      }; 
+      resultsDiv.classList.remove("hidden");
+
+
+    });
+  </script>
+</body>
+</html>

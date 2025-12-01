@@ -1,0 +1,29 @@
+
+<html>
+<head>
+    <title>Cadet Records</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css" >
+    <link rel="icon" type = "image/png" href="Det905_PalousePatriots_Transparent.png"> 
+    <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
+    .grid-square { border: 1px solid #ccc; padding: 10px; border-radius: 8px; color: #333; font-size: 14px; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <h1>Cadet Records</h1>
+    <div id="LoadOverlay"> 
+        <p> <strong> Loading Data </strong> </p>
+        <img src="Ajax_loader_metal_512.gif" alt = "Loading..." style = "width:100px;height:100px">
+    </div>
+    <br>
+    <select id="DataSelector" hidden=true>
+    <option value="">--Select--</option>
+    </select>
+
+    <div id="datagrid"></div>
+    <div id="grid"></div>
+
+    <script src="recordsscript.js"></script>
+</body>
+</html>
